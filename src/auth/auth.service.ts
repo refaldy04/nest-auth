@@ -25,7 +25,7 @@ export class AuthService {
       user,
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
-          expiresIn: '1h',
+          expiresIn: '20s',
           secret: process.env.jwtSecretKey,
         }),
         refreshToken: await this.jwtService.signAsync(payload, {
@@ -45,5 +45,23 @@ export class AuthService {
     }
 
     throw new UnauthorizedException();
+  }
+
+  async refreshToken(user: any) {
+    const payload = {
+      email: user.email,
+      sub: user.sub,
+    };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '20s',
+        secret: process.env.jwtSecretKey,
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+        secret: process.env.jwtRefreshTokenKey,
+      }),
+    };
   }
 }
